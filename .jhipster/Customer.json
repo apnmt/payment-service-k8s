@@ -1,0 +1,31 @@
+{
+  "name": "Customer",
+  "fields": [
+    {
+      "fieldName": "organizationId",
+      "fieldType": "Long",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "aSubscription",
+      "otherEntityRelationshipName": "customer",
+      "relationshipName": "aSubscription"
+    }
+  ],
+  "entityTableName": "customer",
+  "dto": "mapstruct",
+  "pagination": "no",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["paymentservice"],
+  "microserviceName": "paymentservice",
+  "clientRootFolder": "paymentservice",
+  "databaseType": "sql",
+  "changelogDate": "20211129145953"
+}

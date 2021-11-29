@@ -1,0 +1,36 @@
+{
+  "name": "Product",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "price",
+      "otherEntityRelationshipName": "product",
+      "relationshipName": "price"
+    }
+  ],
+  "entityTableName": "product",
+  "dto": "mapstruct",
+  "pagination": "no",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["paymentservice"],
+  "microserviceName": "paymentservice",
+  "clientRootFolder": "paymentservice",
+  "databaseType": "sql",
+  "changelogDate": "20211129145553"
+}

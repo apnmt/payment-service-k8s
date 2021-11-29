@@ -1,0 +1,59 @@
+application {
+  config {
+    baseName paymentservice,
+    applicationType microservice,
+    packageName de.apnmt.payment,
+    authenticationType jwt,
+    prodDatabaseType postgresql,
+    devDatabaseType h2Memory,
+    enableSwaggerCodegen true,
+    skipClient true,
+    cacheProvider no,
+    skipUserManagement true,
+    serviceDiscoveryType no,
+    serverPort 8084
+  }
+  entities *
+}
+
+entity Product {
+	name String required,
+    description String required
+}
+
+entity Price {
+	nickname String required,
+    currency String required,
+    postalCode String required,
+    amount Long required,
+    interval String required
+}
+
+entity ASubscription {
+	expirationDate Instant required
+}
+
+entity SubscriptionItem {
+	quantity Integer required
+}
+
+entity Customer {
+	organizationId Long required
+}
+
+// defining multiple OneToMany relationships with comments
+relationship OneToMany {
+	Product to Price{product},
+	Price to SubscriptionItem{price},
+    ASubscription to SubscriptionItem{subscription},
+    Customer to ASubscription{customer}
+}
+
+// Set pagination options
+paginate ASubscription with pagination
+
+// Use Data Transfer Objects (DTO)
+dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceClass

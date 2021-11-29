@@ -1,0 +1,57 @@
+{
+  "name": "Price",
+  "fields": [
+    {
+      "fieldName": "nickname",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "currency",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "postalCode",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "amount",
+      "fieldType": "Long",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "interval",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "subscriptionItem",
+      "otherEntityRelationshipName": "price",
+      "relationshipName": "subscriptionItem"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "product",
+      "otherEntityRelationshipName": "price",
+      "relationshipName": "product"
+    }
+  ],
+  "entityTableName": "price",
+  "dto": "mapstruct",
+  "pagination": "no",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["paymentservice"],
+  "microserviceName": "paymentservice",
+  "clientRootFolder": "paymentservice",
+  "databaseType": "sql",
+  "changelogDate": "20211129145653"
+}
