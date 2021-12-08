@@ -13,7 +13,9 @@
     "enableSwaggerCodegen": true,
     "enableTranslation": true,
     "jhiPrefix": "jhi",
-    "languages": ["en"],
+    "languages": [
+      "en"
+    ],
     "messageBroker": false,
     "prodDatabaseType": "postgresql",
     "searchEngine": false,
@@ -31,7 +33,13 @@
     "entitySuffix": "",
     "reactive": false,
     "applicationIndex": 0,
-    "entities": ["Product", "Price", "ASubscription", "SubscriptionItem", "Customer"],
+    "entities": [
+      "Product",
+      "Price",
+      "Subscription",
+      "SubscriptionItem",
+      "Customer"
+    ],
     "skipCheckLengthOfIdentifier": false,
     "skipFakeData": false,
     "blueprints": [],

@@ -1,10 +1,12 @@
 {
-  "name": "ASubscription",
+  "name": "Subscription",
   "fields": [
     {
       "fieldName": "expirationDate",
       "fieldType": "Instant",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": [
+        "required"
+      ]
     }
   ],
   "relationships": [
@@ -17,11 +19,11 @@
     {
       "relationshipType": "many-to-one",
       "otherEntityName": "customer",
-      "otherEntityRelationshipName": "aSubscription",
+      "otherEntityRelationshipName": "subscription",
       "relationshipName": "customer"
     }
   ],
-  "entityTableName": "a_subscription",
+  "entityTableName": "subscription",
   "dto": "mapstruct",
   "pagination": "pagination",
   "service": "serviceClass",
@@ -29,7 +31,9 @@
   "fluentMethods": true,
   "readOnly": false,
   "embedded": false,
-  "applications": ["paymentservice"],
+  "applications": [
+    "paymentservice"
+  ],
   "microserviceName": "paymentservice",
   "clientRootFolder": "paymentservice",
   "databaseType": "sql",

@@ -18,6 +18,6 @@
                                  baseTableName="subscription_item"
                                  constraintName="fk_subscription_item__subscription_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="a_subscription"/>
+                                 referencedTableName="subscription"/>
     </changeSet>
 </databaseChangeLog>

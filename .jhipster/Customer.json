@@ -10,9 +10,9 @@
   "relationships": [
     {
       "relationshipType": "one-to-many",
-      "otherEntityName": "aSubscription",
+      "otherEntityName": "subscription",
       "otherEntityRelationshipName": "customer",
-      "relationshipName": "aSubscription"
+      "relationshipName": "subscription"
     }
   ],
   "entityTableName": "customer",

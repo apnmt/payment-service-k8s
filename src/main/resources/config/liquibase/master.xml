@@ -17,12 +17,12 @@
     <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20211129145553_added_entity_Product.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20211129145653_added_entity_Price.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20211129145753_added_entity_ASubscription.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211129145753_added_entity_Subscription.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20211129145853_added_entity_SubscriptionItem.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20211129145953_added_entity_Customer.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20211129145653_added_entity_constraints_Price.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20211129145753_added_entity_constraints_ASubscription.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211129145753_added_entity_constraints_Subscription.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20211129145853_added_entity_constraints_SubscriptionItem.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->

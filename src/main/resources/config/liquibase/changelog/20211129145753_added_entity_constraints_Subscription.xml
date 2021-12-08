@@ -4,13 +4,13 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
     <!--
-        Added the constraints for entity ASubscription.
+        Added the constraints for entity Subscription.
     -->
     <changeSet id="20211129145753-2" author="jhipster">
 
         <addForeignKeyConstraint baseColumnNames="customer_id"
-                                 baseTableName="a_subscription"
-                                 constraintName="fk_a_subscription__customer_id"
+                                 baseTableName="subscription"
+                                 constraintName="fk_subscription_customer_id"
                                  referencedColumnNames="id"
                                  referencedTableName="customer"/>
     </changeSet>

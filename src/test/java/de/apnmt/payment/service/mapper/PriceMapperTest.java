@@ -1,9 +1,8 @@
 package de.apnmt.payment.service.mapper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import de.apnmt.payment.common.service.mapper.PriceMapper;
+import de.apnmt.payment.common.service.mapper.PriceMapperImpl;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 class PriceMapperTest {
 
@@ -11,6 +10,6 @@ class PriceMapperTest {
 
     @BeforeEach
     public void setUp() {
-        priceMapper = new PriceMapperImpl();
+        this.priceMapper = new PriceMapperImpl();
     }
 }

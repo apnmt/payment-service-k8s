@@ -1,8 +1,10 @@
 package de.apnmt.payment.config;
 
 import java.sql.SQLException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -14,7 +16,8 @@ import tech.jhipster.config.JHipsterConstants;
 import tech.jhipster.config.h2.H2ConfigurationHelper;
 
 @Configuration
-@EnableJpaRepositories({ "de.apnmt.payment.repository" })
+@EnableJpaRepositories({"de.apnmt.payment.common.repository"})
+@EntityScan({"de.apnmt.payment.common.domain"})
 @EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware")
 @EnableTransactionManagement
 public class DatabaseConfiguration {
@@ -36,13 +39,13 @@ public class DatabaseConfiguration {
     @Bean(initMethod = "start", destroyMethod = "stop")
     @Profile(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT)
     public Object h2TCPServer() throws SQLException {
-        String port = getValidPortForH2();
-        log.debug("H2 database is available on port {}", port);
+        String port = this.getValidPortForH2();
+        this.log.debug("H2 database is available on port {}", port);
         return H2ConfigurationHelper.createServer(port);
     }
 
     private String getValidPortForH2() {
-        int port = Integer.parseInt(env.getProperty("server.port"));
+        int port = Integer.parseInt(this.env.getProperty("server.port"));
         if (port < 10000) {
             port = 10000 + port;
         } else {

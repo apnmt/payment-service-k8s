@@ -15,8 +15,8 @@
 
 spring:
   profiles:
-    # Uncomment the following line to enable tests against production database type rather than H2, using Testcontainers
-    #active: testcontainers
+  # Uncomment the following line to enable tests against production database type rather than H2, using Testcontainers
+  #active: testcontainers
   application:
     name: paymentservice
   datasource:
@@ -68,6 +68,8 @@ spring:
         size: 1
   thymeleaf:
     mode: HTML
+  kafka:
+    bootstrap-servers: changeit
 
 server:
   port: 10344
@@ -106,4 +108,8 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  payservice:
+    trial-period-days: 0
+    stripekey: changeit
+

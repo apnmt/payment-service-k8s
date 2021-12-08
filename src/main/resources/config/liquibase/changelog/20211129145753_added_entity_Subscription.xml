@@ -1,28 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd
-                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
 
     <!--
-        Added the entity ASubscription.
+        Added the entity Subscription.
     -->
     <changeSet id="20211129145753-1" author="jhipster">
-        <createTable tableName="a_subscription">
-            <column name="id" type="bigint">
+        <createTable tableName="subscription">
+            <column name="id" type="varchar(255)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="expiration_date" type="${datetimeType}">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
-            <column name="customer_id" type="bigint">
-                <constraints nullable="true" />
+            <column name="customer_id" type="varchar(255)">
+                <constraints nullable="true"/>
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
-        <dropDefaultValue tableName="a_subscription" columnName="expiration_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="subscription" columnName="expiration_date" columnDataType="${datetimeType}"/>
     </changeSet>
 
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
@@ -37,11 +35,11 @@
     -->
     <changeSet id="20211129145753-1-data" author="jhipster" context="faker">
         <loadData
-                  file="config/liquibase/fake-data/a_subscription.csv"
-                  separator=";"
-                  tableName="a_subscription"
-                  usePreparedStatements="true">
-            <column name="id" type="numeric"/>
+            file="config/liquibase/fake-data/subscription.csv"
+            separator=";"
+            tableName="subscription"
+            usePreparedStatements="true">
+            <column name="id" type="string"/>
             <column name="expiration_date" type="date"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>

@@ -24,12 +24,11 @@ entity Product {
 entity Price {
 	nickname String required,
     currency String required,
-    postalCode String required,
     amount Long required,
     interval String required
 }
 
-entity ASubscription {
+entity Subscription {
 	expirationDate Instant required
 }
 
@@ -45,12 +44,12 @@ entity Customer {
 relationship OneToMany {
 	Product to Price{product},
 	Price to SubscriptionItem{price},
-    ASubscription to SubscriptionItem{subscription},
-    Customer to ASubscription{customer}
+    Subscription to SubscriptionItem{subscription},
+    Customer to Subscription{customer}
 }
 
 // Set pagination options
-paginate ASubscription with pagination
+paginate Subscription with pagination
 
 // Use Data Transfer Objects (DTO)
 dto * with mapstruct

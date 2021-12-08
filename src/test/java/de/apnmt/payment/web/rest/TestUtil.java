@@ -1,27 +1,36 @@
 package de.apnmt.payment.web.rest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.stripe.model.SubscriptionItemCollection;
+import de.apnmt.payment.common.domain.Customer;
+import de.apnmt.payment.common.domain.Price;
+import de.apnmt.payment.common.domain.Product;
+import de.apnmt.payment.common.domain.Subscription;
+import de.apnmt.payment.common.domain.SubscriptionItem;
+import de.apnmt.payment.common.domain.enumeration.Currency;
+import de.apnmt.payment.common.domain.enumeration.Interval;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.format.support.FormattingConversionService;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Utility class for testing REST controllers.
@@ -78,7 +87,7 @@ public final class TestUtil {
         @Override
         protected boolean matchesSafely(String item, Description mismatchDescription) {
             try {
-                if (!date.isEqual(ZonedDateTime.parse(item))) {
+                if (!this.date.isEqual(ZonedDateTime.parse(item))) {
                     mismatchDescription.appendText("was ").appendValue(item);
                     return false;
                 }
@@ -91,7 +100,7 @@ public final class TestUtil {
 
         @Override
         public void describeTo(Description description) {
-            description.appendText("a String representing the same Instant as ").appendValue(date);
+            description.appendText("a String representing the same Instant as ").appendValue(this.date);
         }
     }
 
@@ -117,13 +126,13 @@ public final class TestUtil {
 
         @Override
         public void describeTo(Description description) {
-            description.appendText("a numeric value is ").appendValue(value);
+            description.appendText("a numeric value is ").appendValue(this.value);
         }
 
         @Override
         protected boolean matchesSafely(Number item) {
             BigDecimal bigDecimal = asDecimal(item);
-            return bigDecimal != null && value.compareTo(bigDecimal) == 0;
+            return bigDecimal != null && this.value.compareTo(bigDecimal) == 0;
         }
 
         private static BigDecimal asDecimal(Number item) {
@@ -176,6 +185,7 @@ public final class TestUtil {
 
     /**
      * Create a {@link FormattingConversionService} which use ISO date format, instead of the localized one.
+     *
      * @return the {@link FormattingConversionService}.
      */
     public static FormattingConversionService createFormattingConversionService() {
@@ -188,8 +198,9 @@ public final class TestUtil {
 
     /**
      * Makes a an executes a query to the EntityManager finding all stored objects.
-     * @param <T> The type of objects to be searched
-     * @param em The instance of the EntityManager
+     *
+     * @param <T>  The type of objects to be searched
+     * @param em   The instance of the EntityManager
      * @param clss The class type to be searched
      * @return A list of all found objects
      */
@@ -202,5 +213,74 @@ public final class TestUtil {
         return allQuery.getResultList();
     }
 
-    private TestUtil() {}
+    // PaymentService specific TestUtils
+
+    public static String DEFAULT_CUSTOMER_ID = "customer_1";
+
+    public static String DEFAULT_PRODUCT_ID = "product_1";
+
+    public static String DEFAULT_PRICE_ID = "price_1";
+
+    public static Customer createCustomer() {
+        Customer customer = new Customer();
+        customer.setId(DEFAULT_CUSTOMER_ID);
+        customer.setOrganizationId(1L);
+        return customer;
+    }
+
+    public static com.stripe.model.Customer createStripeCustomer() {
+        com.stripe.model.Customer customer = new com.stripe.model.Customer();
+        customer.setId(DEFAULT_CUSTOMER_ID);
+        return customer;
+    }
+
+    public static Product createProduct() {
+        Product product = new Product();
+        product.setId(DEFAULT_PRODUCT_ID);
+        product.setName("product");
+        product.setDescription("description");
+        return product;
+    }
+
+    public static Price createPrice() {
+        Price price = new Price();
+        price.setId(DEFAULT_PRICE_ID);
+        price.setAmount(5000L);
+        price.setNickname("nickname");
+        price.setCurrency(Currency.eur);
+        price.setInterval(Interval.day);
+        return price;
+    }
+
+    public static SubscriptionItem createSubscriptionItem(Price price) {
+        SubscriptionItem subscriptionItem = new SubscriptionItem();
+        subscriptionItem.setPrice(price);
+        subscriptionItem.setQuantity(1);
+        return subscriptionItem;
+    }
+
+    public static com.stripe.model.Subscription createSubscription(Subscription subscription) {
+        com.stripe.model.Subscription s = new com.stripe.model.Subscription();
+        s.setId("subscription_1");
+        s.setStatus("active");
+        int i = 1;
+        SubscriptionItemCollection collection = new SubscriptionItemCollection();
+        List<com.stripe.model.SubscriptionItem> subscriptionItems = new ArrayList<>();
+        for (SubscriptionItem item : subscription.getSubscriptionItems()) {
+            com.stripe.model.SubscriptionItem subscriptionItem = new com.stripe.model.SubscriptionItem();
+            subscriptionItem.setId("subscriptionItem_" + i);
+            subscriptionItem.setQuantity(item.getQuantity().longValue());
+            com.stripe.model.Price price = new com.stripe.model.Price();
+            price.setId(item.getPrice().getId());
+            subscriptionItem.setPrice(price);
+            subscriptionItems.add(subscriptionItem);
+            i++;
+        }
+        collection.setData(subscriptionItems);
+        s.setItems(collection);
+        return s;
+    }
+
+    private TestUtil() {
+    }
 }

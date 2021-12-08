@@ -16,7 +16,7 @@
     },
     {
       "relationshipType": "many-to-one",
-      "otherEntityName": "aSubscription",
+      "otherEntityName": "subscription",
       "otherEntityRelationshipName": "subscriptionItem",
       "relationshipName": "subscription"
     }
