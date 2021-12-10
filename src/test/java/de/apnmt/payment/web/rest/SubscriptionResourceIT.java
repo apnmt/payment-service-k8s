@@ -3,8 +3,15 @@ package de.apnmt.payment.web.rest;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
+import com.fasterxml.jackson.core.type.TypeReference;
+import de.apnmt.common.TopicConstants;
+import de.apnmt.common.event.ApnmtEvent;
+import de.apnmt.common.event.ApnmtEventType;
+import de.apnmt.common.event.value.OrganizationActivationEventDTO;
+import de.apnmt.k8s.common.test.AbstractEventSenderIT;
 import de.apnmt.payment.IntegrationTest;
 import de.apnmt.payment.common.domain.Customer;
 import de.apnmt.payment.common.domain.Price;
@@ -22,6 +29,7 @@ import de.apnmt.payment.common.service.mapper.SubscriptionMapper;
 import de.apnmt.payment.common.service.stripe.CustomerStripeService;
 import de.apnmt.payment.common.service.stripe.SubscriptionStripeService;
 import de.apnmt.payment.common.web.rest.SubscriptionResource;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -30,6 +38,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,9 +55,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Integration tests for the {@link SubscriptionResource} REST controller.
  */
+@EnableKafka
+@EmbeddedKafka(ports = {58255}, topics = {TopicConstants.ORGANIZATION_ACTIVATION_CHANGED_TOPIC})
 @IntegrationTest
 @AutoConfigureMockMvc
-class SubscriptionResourceIT {
+class SubscriptionResourceIT extends AbstractEventSenderIT {
 
     private static final LocalDateTime DEFAULT_EXPIRATION_DATE = LocalDateTime.of(2021, 12, 24, 0, 0, 11, 0);
     private static final LocalDateTime UPDATED_EXPIRATION_DATE = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
@@ -116,6 +128,11 @@ class SubscriptionResourceIT {
         return subscription;
     }
 
+    @Override
+    public String getTopic() {
+        return TopicConstants.ORGANIZATION_ACTIVATION_CHANGED_TOPIC;
+    }
+
     @BeforeEach
     public void initTest() {
         this.subscription = createEntity(this.em);
@@ -147,7 +164,9 @@ class SubscriptionResourceIT {
         when(this.customerStripeService.createPaymentMethod(any(), any())).thenReturn(null);
 
         SubscriptionDTO subscriptionDTO = this.subscriptionMapper.toDto(this.subscription);
-        this.restSubscriptionMockMvc.perform(post(ENTITY_API_URL_CHECKOUT).contentType(MediaType.APPLICATION_JSON).header("X-paymentMethod", "paymentMethod").content(TestUtil.convertObjectToJsonBytes(subscriptionDTO))).andExpect(status().isCreated());
+        this.restSubscriptionMockMvc.perform(post(ENTITY_API_URL_CHECKOUT).contentType(MediaType.APPLICATION_JSON)
+            .header("X-paymentMethod", "paymentMethod")
+            .content(TestUtil.convertObjectToJsonBytes(subscriptionDTO))).andExpect(status().isCreated());
 
         // Validate the Subscription in the database
         List<Subscription> subscriptionList = this.subscriptionRepository.findAll();
@@ -162,6 +181,17 @@ class SubscriptionResourceIT {
             assertThat(item.getQuantity()).isEqualTo(1);
             assertThat(item.getPrice()).isEqualTo(price);
         }
+
+        ConsumerRecord<String, Object> message = this.records.poll(500, TimeUnit.MILLISECONDS);
+        assertThat(message).isNotNull();
+        assertThat(message.value()).isNotNull();
+
+        TypeReference<ApnmtEvent<OrganizationActivationEventDTO>> eventType = new TypeReference<>() {
+        };
+        ApnmtEvent<OrganizationActivationEventDTO> eventResult = this.objectMapper.readValue(message.value().toString(), eventType);
+        assertThat(eventResult.getType()).isEqualTo(ApnmtEventType.organizationActivationChanged);
+        assertThat(eventResult.getValue().getOrganizationId()).isEqualTo(customer.getOrganizationId());
+        assertThat(eventResult.getValue().isActive()).isTrue();
     }
 
     @Test
@@ -174,7 +204,9 @@ class SubscriptionResourceIT {
         int databaseSizeBeforeCreate = this.subscriptionRepository.findAll().size();
 
         // An entity without paymentMethod cannot be created, so this API call must fail
-        this.restSubscriptionMockMvc.perform(post(ENTITY_API_URL_CHECKOUT).contentType(MediaType.APPLICATION_JSON).header("X-paymentMethod", "paymentMethod").content(TestUtil.convertObjectToJsonBytes(subscriptionDTO))).andExpect(status().isBadRequest());
+        this.restSubscriptionMockMvc.perform(post(ENTITY_API_URL_CHECKOUT).contentType(MediaType.APPLICATION_JSON)
+            .header("X-paymentMethod", "paymentMethod")
+            .content(TestUtil.convertObjectToJsonBytes(subscriptionDTO))).andExpect(status().isBadRequest());
 
         // Validate the Subscription in the database
         List<Subscription> subscriptionList = this.subscriptionRepository.findAll();
@@ -191,7 +223,8 @@ class SubscriptionResourceIT {
         int databaseSizeBeforeCreate = this.subscriptionRepository.findAll().size();
 
         // An entity with an existing ID cannot be created, so this API call must fail
-        this.restSubscriptionMockMvc.perform(post(ENTITY_API_URL_CHECKOUT).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(subscriptionDTO))).andExpect(status().isBadRequest());
+        this.restSubscriptionMockMvc.perform(post(ENTITY_API_URL_CHECKOUT).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(subscriptionDTO)))
+            .andExpect(status().isBadRequest());
 
         // Validate the Subscription in the database
         List<Subscription> subscriptionList = this.subscriptionRepository.findAll();
@@ -211,7 +244,11 @@ class SubscriptionResourceIT {
         this.subscriptionRepository.saveAndFlush(this.subscription);
 
         // Get all the subscriptionList
-        this.restSubscriptionMockMvc.perform(get(ENTITY_API_URL_CUSTOMER_ID, customer.getId())).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE)).andExpect(jsonPath("$.[*].id").value(hasItem(this.subscription.getId()))).andExpect(jsonPath("$.[*].expirationDate").value(hasItem(DEFAULT_EXPIRATION_DATE.toString())));
+        this.restSubscriptionMockMvc.perform(get(ENTITY_API_URL_CUSTOMER_ID, customer.getId()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(this.subscription.getId())))
+            .andExpect(jsonPath("$.[*].expirationDate").value(hasItem(DEFAULT_EXPIRATION_DATE.toString())));
     }
 
     @Test
@@ -233,7 +270,11 @@ class SubscriptionResourceIT {
         this.subscriptionRepository.saveAndFlush(this.subscription);
 
         // Get the subscription
-        this.restSubscriptionMockMvc.perform(get(ENTITY_API_URL_ID, this.subscription.getId())).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE)).andExpect(jsonPath("$.id").value(this.subscription.getId())).andExpect(jsonPath("$.expirationDate").value(DEFAULT_EXPIRATION_DATE.toString()));
+        this.restSubscriptionMockMvc.perform(get(ENTITY_API_URL_ID, this.subscription.getId()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.id").value(this.subscription.getId()))
+            .andExpect(jsonPath("$.expirationDate").value(DEFAULT_EXPIRATION_DATE.toString()));
     }
 
     @Test

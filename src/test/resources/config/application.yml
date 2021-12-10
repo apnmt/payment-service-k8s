@@ -69,7 +69,7 @@ spring:
   thymeleaf:
     mode: HTML
   kafka:
-    bootstrap-servers: changeit
+    bootstrap-servers: localhost:58255
 
 server:
   port: 10344
