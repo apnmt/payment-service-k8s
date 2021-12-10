@@ -43,7 +43,7 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 @EmbeddedKafka(ports = {58255}, topics = {TopicConstants.ORGANIZATION_ACTIVATION_CHANGED_TOPIC})
 @IntegrationTest
 @AutoConfigureMockMvc
-public class SubscriptionExpirationServiceIT extends AbstractEventSenderIT {
+class SubscriptionExpirationServiceIT extends AbstractEventSenderIT {
 
     @Autowired
     private SubscriptionExpirationService subscriptionExpirationService;
