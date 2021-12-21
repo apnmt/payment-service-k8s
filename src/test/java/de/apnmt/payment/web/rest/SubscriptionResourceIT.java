@@ -135,6 +135,7 @@ class SubscriptionResourceIT extends AbstractEventSenderIT {
 
     @BeforeEach
     public void initTest() {
+        subscriptionRepository.deleteAll();
         this.subscription = createEntity(this.em);
         MockitoAnnotations.initMocks(this);
     }

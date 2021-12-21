@@ -6,8 +6,10 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.persistence.EntityManager;
 import com.stripe.exception.StripeException;
+import de.apnmt.payment.CommonIT;
 import de.apnmt.payment.IntegrationTest;
 import de.apnmt.payment.common.domain.Product;
+import de.apnmt.payment.common.repository.PriceRepository;
 import de.apnmt.payment.common.repository.ProductRepository;
 import de.apnmt.payment.common.service.ProductService;
 import de.apnmt.payment.common.service.dto.ProductDTO;
@@ -40,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @IntegrationTest
 @AutoConfigureMockMvc
-class ProductResourceIT {
+class ProductResourceIT extends CommonIT {
 
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
@@ -53,9 +55,6 @@ class ProductResourceIT {
 
     private static final Random random = new Random();
     private static final AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
-
-    @Autowired
-    private ProductRepository productRepository;
 
     @Autowired
     private ProductMapper productMapper;
@@ -99,6 +98,8 @@ class ProductResourceIT {
 
     @BeforeEach
     public void initTest() throws StripeException {
+        priceRepository.deleteAll();
+        productRepository.deleteAll();
         this.product = createEntity(this.em);
         MockitoAnnotations.initMocks(this);
         when(this.productStripeService.save(any())).thenReturn(this.productMapper.toDto(TestUtil.createProduct()));

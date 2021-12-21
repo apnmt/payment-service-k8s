@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.persistence.EntityManager;
 import com.stripe.exception.StripeException;
+import de.apnmt.payment.CommonIT;
 import de.apnmt.payment.IntegrationTest;
 import de.apnmt.payment.common.domain.Price;
 import de.apnmt.payment.common.domain.Product;
@@ -44,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @IntegrationTest
 @AutoConfigureMockMvc
-class PriceResourceIT {
+class PriceResourceIT extends CommonIT {
 
     private static final String DEFAULT_NICKNAME = "AAAAAAAAAA";
     private static final String UPDATED_NICKNAME = "BBBBBBBBBB";
@@ -65,13 +66,7 @@ class PriceResourceIT {
     private static final AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
-    private PriceRepository priceRepository;
-
-    @Autowired
     private PriceMapper priceMapper;
-
-    @Autowired
-    private ProductRepository productRepository;
 
     @MockBean
     private PriceStripeService priceStripeService;

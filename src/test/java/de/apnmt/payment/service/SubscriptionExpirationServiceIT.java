@@ -33,6 +33,7 @@ import de.apnmt.payment.common.service.SubscriptionExpirationService;
 import de.apnmt.payment.web.rest.TestUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -63,6 +64,14 @@ class SubscriptionExpirationServiceIT extends AbstractEventSenderIT {
     @Override
     public String getTopic() {
         return TopicConstants.ORGANIZATION_ACTIVATION_CHANGED_TOPIC;
+    }
+
+    @BeforeEach
+    public void initTest() {
+        subscriptionRepository.deleteAll();
+        customerRepository.deleteAll();
+        priceRepository.deleteAll();
+        productRepository.deleteAll();
     }
 
     @Test

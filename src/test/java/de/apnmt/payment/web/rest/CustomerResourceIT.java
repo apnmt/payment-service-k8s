@@ -3,9 +3,13 @@ package de.apnmt.payment.web.rest;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import de.apnmt.payment.CommonIT;
 import de.apnmt.payment.IntegrationTest;
 import de.apnmt.payment.common.domain.Customer;
 import de.apnmt.payment.common.repository.CustomerRepository;
+import de.apnmt.payment.common.repository.PriceRepository;
+import de.apnmt.payment.common.repository.ProductRepository;
+import de.apnmt.payment.common.repository.SubscriptionRepository;
 import de.apnmt.payment.common.service.CustomerService;
 import de.apnmt.payment.common.service.dto.CustomerDTO;
 import de.apnmt.payment.common.service.mapper.CustomerMapper;
@@ -32,16 +36,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @IntegrationTest
 @AutoConfigureMockMvc
-class CustomerResourceIT {
+class CustomerResourceIT extends CommonIT {
 
     private static final Long DEFAULT_ORGANIZATION_ID = 1L;
     private static final Long UPDATED_ORGANIZATION_ID = 2L;
 
     private static final String ENTITY_API_URL = "/api/customers";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
-
-    @Autowired
-    private CustomerRepository customerRepository;
 
     @Autowired
     private CustomerMapper customerMapper;
@@ -74,6 +75,10 @@ class CustomerResourceIT {
 
     @BeforeEach
     public void initTest() {
+        subscriptionRepository.deleteAll();
+        priceRepository.deleteAll();
+        productRepository.deleteAll();
+        customerRepository.deleteAll();
         MockitoAnnotations.initMocks(this);
         this.customer = createEntity(this.em);
     }
