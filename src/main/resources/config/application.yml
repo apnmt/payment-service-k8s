@@ -128,6 +128,7 @@ spring:
     bootstrap-servers: localhost:9092
     consumer:
       group-id: payment-service
+      auto-startup: false
 
 server:
   servlet:
