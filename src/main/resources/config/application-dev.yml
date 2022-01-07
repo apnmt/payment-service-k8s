@@ -96,4 +96,7 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  payservice:
+    trial-period-days: 0
+    stripekey: changeit
