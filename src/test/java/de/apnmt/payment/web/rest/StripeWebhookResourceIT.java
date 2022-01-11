@@ -1,13 +1,3 @@
-/*
- * StripeWebhookResourceIT.java
- *
- * (c) Copyright AUDI AG, 2021
- * All Rights reserved.
- *
- * AUDI AG
- * 85057 Ingolstadt
- * Germany
- */
 package de.apnmt.payment.web.rest;
 
 import java.time.Instant;
