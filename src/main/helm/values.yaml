@@ -3,7 +3,7 @@
 replicaCount: 1
 
 image:
-    tag: paymentservice-k8s
+    tag: paymentservice
     pullPolicy: Always
 
 emissary:
