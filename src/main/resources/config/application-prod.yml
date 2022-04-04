@@ -112,4 +112,4 @@ jhipster:
 application:
   payservice:
     trial-period-days: 0
-    stripekey: changeit
+    stripekey: sk_test_51KjJ17HXw9z9dE0COAvYmQMJh8mIJI7gaALOEg1jmzkq28PcszDso5CWTpCpcQgrwx9eTzpSgMrOlMgOcq6D2aSv005NqOgnh4
