@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import com.stripe.exception.StripeException;
 import de.apnmt.payment.CommonIT;
 import de.apnmt.payment.IntegrationTest;
+import de.apnmt.payment.common.domain.Customer;
 import de.apnmt.payment.common.domain.Price;
 import de.apnmt.payment.common.domain.Product;
 import de.apnmt.payment.common.domain.enumeration.Currency;
@@ -33,9 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -258,5 +257,25 @@ class PriceResourceIT extends CommonIT {
         // Validate the Price in the database
         List<Price> priceList = this.priceRepository.findAll();
         assertThat(priceList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void deleteAll() throws Exception {
+        // Initialize the database
+        Product product = ProductResourceIT.createEntity(this.em);
+        product.setId("prod_LQ9MM3UEDGiaJg");
+        this.productRepository.saveAndFlush(product);
+        this.price.setId("price_" + count.incrementAndGet());
+        this.priceRepository.saveAndFlush(this.price);
+
+        int databaseSizeBeforeDelete = this.priceRepository.findAll().size();
+
+        // Delete the appointment
+        this.restPriceMockMvc.perform(delete(ENTITY_API_URL).accept(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+
+        // Validate the database contains no more item
+        List<Price> list = this.priceRepository.findAll();
+        assertThat(list).hasSize(databaseSizeBeforeDelete - 1);
     }
 }

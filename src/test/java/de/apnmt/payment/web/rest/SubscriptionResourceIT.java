@@ -46,8 +46,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -283,5 +282,20 @@ class SubscriptionResourceIT extends AbstractEventSenderIT {
     void getNonExistingSubscription() throws Exception {
         // Get the subscription
         this.restSubscriptionMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Transactional
+    void deleteAll() throws Exception {
+        // Initialize the database
+        this.subscription.setId("subscription");
+        this.subscriptionRepository.saveAndFlush(this.subscription);
+
+        // Delete the appointment
+        this.restSubscriptionMockMvc.perform(delete(ENTITY_API_URL).accept(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+
+        // Validate the database contains no more item
+        List<Subscription> list = this.subscriptionRepository.findAll();
+        assertThat(list).hasSize(0);
     }
 }

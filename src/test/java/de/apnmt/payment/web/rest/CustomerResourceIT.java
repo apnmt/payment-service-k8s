@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -117,5 +119,22 @@ class CustomerResourceIT extends CommonIT {
         // Validate the Customer in the database
         List<Customer> customerList = this.customerRepository.findAll();
         assertThat(customerList).hasSize(databaseSizeBeforeCreate);
+    }
+
+    @Test
+    @Transactional
+    void deleteAll() throws Exception {
+        // Initialize the database
+        this.customer.setId(TestUtil.DEFAULT_CUSTOMER_ID);
+        this.customerRepository.saveAndFlush(this.customer);
+
+        int databaseSizeBeforeDelete = this.customerRepository.findAll().size();
+
+        // Delete the appointment
+        this.restCustomerMockMvc.perform(delete(ENTITY_API_URL).accept(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+
+        // Validate the database contains no more item
+        List<Customer> list = this.customerRepository.findAll();
+        assertThat(list).hasSize(databaseSizeBeforeDelete - 1);
     }
 }

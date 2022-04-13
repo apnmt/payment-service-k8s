@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import com.stripe.exception.StripeException;
 import de.apnmt.payment.CommonIT;
 import de.apnmt.payment.IntegrationTest;
+import de.apnmt.payment.common.domain.Price;
 import de.apnmt.payment.common.domain.Product;
 import de.apnmt.payment.common.repository.PriceRepository;
 import de.apnmt.payment.common.repository.ProductRepository;
@@ -30,9 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -243,5 +242,22 @@ class ProductResourceIT extends CommonIT {
         // Validate the Product in the database
         List<Product> productList = this.productRepository.findAll();
         assertThat(productList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void deleteAll() throws Exception {
+        // Initialize the database
+        this.product.setId("product_" + count.incrementAndGet());
+        this.productRepository.saveAndFlush(this.product);
+
+        int databaseSizeBeforeDelete = this.productRepository.findAll().size();
+
+        // Delete the appointment
+        this.restProductMockMvc.perform(delete(ENTITY_API_URL).accept(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+
+        // Validate the database contains no more item
+        List<Product> list = this.productRepository.findAll();
+        assertThat(list).hasSize(databaseSizeBeforeDelete - 1);
     }
 }
