@@ -110,7 +110,7 @@
         <dependency>
             <groupId>de.apnmt.payment</groupId>
             <artifactId>payment-service-common</artifactId>
-            <version>0.0.8-SNAPSHOT</version>
+            <version>0.0.9-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.apnmt.k8s.common</groupId>
